@@ -1,6 +1,6 @@
 #!/bin/bash
-# Update HOSTNAMES and run to test MPI connectivity by placing one process on each socket
-# If MPI is working, each nodes' hostname will print to stdout
+# To test MPI connectivity, run: bash mpitest.sh
+# This test places one worker on each socket which prints the local hostname
 
 hostnames=$( cat hosts.txt )
 num_nodes=`awk -F, '{print NF}' hosts.txt | head -1 `
