@@ -1,11 +1,24 @@
 #!/bin/bash
-VERSION=2.6.0
-yes 'y' | sudo yum install libarchive-devel
-yes 'y' | sudo yum install squashfs-tools
-wget https://github.com/singularityware/singularity/releases/download/$VERSION/singularity-$VERSION.tar.gz /singularity-$VERSION.tar.gz
+# Install Singularity
 
-tar xvf singularity-$VERSION.tar.gz
-cd singularity-$VERSION
-./configure --prefix=/root/singularity
-make
-sudo make install
+# Required to build Singularity
+sudo yum -y groupinstall "Development Tools"
+sudo yum -y install libarchive-devel
+sudo yum -y install squashfs-tools
+sudo yum -y install git
+
+# Download and build Singularity from the GitHub master branch
+git clone https://github.com/singularityware/singularity.git
+cd singularity
+./autogen.sh
+./configure
+make dist
+rpmbuild -ta singularity-*.tar.gz
+
+# Install newly built Singularity RPM package
+sudo yum -y install $HOME/rpmbuild/RPMS/x86_64/singularity-*.x86_64.rpm
+
+# Install additional dependencies
+sudo yum -y install epel-release
+sudo yum -y install debootstrap
+
