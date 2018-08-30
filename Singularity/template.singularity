@@ -57,7 +57,7 @@ From: centos:latest
   export LD_LIBRARY_PATH=/opt/gcc-6.2.0/lib64:/opt/gcc-6.2.0/lib
   export PATH=/opt/anaconda2/bin:$PATH
 
-  http_proxy=http://<your_http_proxy>:<port>
+  export http_proxy=http://<your_http_proxy>:<port>
   export https_proxy=http://<your_https_proxy>:<port>
   export ftp_proxy=http://<your_ftp_proxy>:<port>
   export socks_proxy=http://<your_socks_proxy>:<port>
