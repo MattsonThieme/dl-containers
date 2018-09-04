@@ -15,10 +15,10 @@ NUM_INTER_THREADS=2
 
 # Calculate MPI execution parameters given workers/node, number of nodes, and core counts on each node
 
-export physical_cores=`lscpu | grep "Core(s) per socket" | cut -d':' -f2 | sed "s/ //g"` # Total number of physical cores per socket
+export physical_cores=`lscpu | grep "Core(s) per socket" | cut -d':' -f2 | xargs` # Total number of physical cores per socket
 export num_nodes=`awk -F, '{print NF}' ${HOSTFILE} | head -1 `                # Number of nodes (addresses in hosts.txt must be comma separated on a single line)
 export hostnames=$( cat ${HOSTFILE} )                                         # Hostnames from node_ips
-export num_sockets=`lscpu | grep "Socket(s)" | cut -d':' -f2 | sed "s/ //g"`  # Number of sockets per node
+export num_sockets=`lscpu | grep "Socket(s)" | cut -d':' -f2 | xargs`  # Number of sockets per node
 export num_processes=$(( $num_nodes * $NUM_WORKERS_PER_NODE ))                # Total number of workers across all nodes
 export ppr=$(( $NUM_WORKERS_PER_NODE / $num_sockets ))                        # Processes per resource
 export pe=$(( $physical_cores / $ppr ))                                       # Cores per process
