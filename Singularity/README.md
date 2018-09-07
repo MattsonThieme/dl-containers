@@ -1,6 +1,6 @@
 # Intel Optimized Singularity Containers
 
-This repo contains instructions for running custom scripts within Singularity containers optimized for execution on Intel Architecture. OpenMPI and Horovod libraries facilitate multi-node and multi-worker training. 
+This repository contains code and instructions for running custom scripts within Singularity containers optimized for execution on Intel Architecture. OpenMPI and Horovod libraries facilitate multi-node and multi-worker training. 
 
 ## Cluster Requirements
 
