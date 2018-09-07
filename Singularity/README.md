@@ -82,15 +82,20 @@ To build a custom container, begin by editing `template.singularity`. In this fi
 ```
 %post
 
-  # Commands in the %post section are executed within the container after the base OS has been installed at build time. This section will contain the majority of the setup, including installing software and libraries.
+  # Commands in the %post section are executed within the container after the base OS has been
+  # installed at build time. This section will contain the majority of the setup, including 
+  # installing software and libraries.
 
 %setup
 
-  # Commands in the %setup section are executed on the host system outside of the container after the base OS has been installed.
+  # Commands in the %setup section are executed on the host system outside of the container after
+  # the base OS has been installed.
 
 %environment
 
-  # Add environment variables in the %environment section. Note that these environment variables are sourced at runtime and not at build time, meaning that if the same variables are needed during build time (i.e. proxies), these should also be defined in the %post section.
+  # Add environment variables in the %environment section. Note that these environment variables 
+  # are sourced at runtime and not at build time, meaning that if the same variables are needed 
+  # during build time (i.e. proxies), these should also be defined in the %post section.
 ```
 
 Once template.singularity has been edited to include all the desired packages, environment settings, and runscript instructions, build a new container `custom_container.simg` with the following command:
