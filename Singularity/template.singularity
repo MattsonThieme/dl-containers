@@ -3,10 +3,10 @@ From: centos:latest
 %post -c /bin/bash
 # If your environment requires a proxy to reach internet, then export the proxy variables accordingly
   
-  export http_proxy=http://<your_http_proxy>:<port>
-  export https_proxy=http://<your_https_proxy>:<port>
-  export ftp_proxy=http://<your_ftp_proxy>:<port>
-  export socks_proxy=http://<your_socks_proxy>:<port>
+  export http_proxy=http://proxy-chain.intel.com:911
+  export https_proxy=http://proxy-chain.intel.com:912
+  export ftp_proxy=http://proxy-chain.intel.com:911
+  export socks_proxy=http://proxy-us.intel.com:1080
 
   yum clean all
   rm -rf /var/cache/yum
@@ -41,6 +41,12 @@ From: centos:latest
   pip install horovod
   git clone https://github.com/NervanaSystems/topologies.git
 
+  # Install Jupyter
+  pip install jupyterlab
+  pip install numpy
+  pip install matplotlib
+  pip install ipyparallel
+
   #In case module throws an error (eg. on TACC), use:
   #export PATH=/usr/lib64/openmpi/bin:$PATH
   #export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH
@@ -57,10 +63,10 @@ From: centos:latest
   export LD_LIBRARY_PATH=/opt/gcc-6.2.0/lib64:/opt/gcc-6.2.0/lib
   export PATH=/opt/anaconda2/bin:$PATH
 
-  export http_proxy=http://<your_http_proxy>:<port>
-  export https_proxy=http://<your_https_proxy>:<port>
-  export ftp_proxy=http://<your_ftp_proxy>:<port>
-  export socks_proxy=http://<your_socks_proxy>:<port>
+  export http_proxy=http://proxy-chain.intel.com:911
+  export https_proxy=http://proxy-chain.intel.com:912
+  export ftp_proxy=http://proxy-chain.intel.com:911
+  export socks_proxy=http://proxy-us.intel.com:1080
 
   # Add openmpi
   source /etc/profile.d/modules.sh
@@ -72,6 +78,11 @@ From: centos:latest
   export KMP_SETTINGS=0
 
 %runscript
+  # commands to be executed when the container runs
+  echo "Starting notebook..."
+  echo "Open browser to localhost:8888"
+  exec jupyter lab --allow-root --ip=0.0.0.0 --port=8888 --no-browser
+
   echo "This is a Singularity image containing Intel optimized TensorFlow installation with Horovod (OpenMPI)"
   echo "Operating System: $(cat /etc/redhat-release)"
   echo "GCC: $(gcc --version)"
