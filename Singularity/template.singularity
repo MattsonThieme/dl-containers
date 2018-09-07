@@ -1,12 +1,7 @@
 Bootstrap: docker
 From: centos:latest
+
 %post -c /bin/bash
-# If your environment requires a proxy to reach internet, then export the proxy variables accordingly
-  
-  export http_proxy=http://proxy-chain.intel.com:911
-  export https_proxy=http://proxy-chain.intel.com:912
-  export ftp_proxy=http://proxy-chain.intel.com:911
-  export socks_proxy=http://proxy-us.intel.com:1080
 
   yum clean all
   rm -rf /var/cache/yum
