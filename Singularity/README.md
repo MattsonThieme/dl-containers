@@ -77,7 +77,7 @@ Once `run_user_script.sh` has been updated and all the data and scripts are in i
 
 ## Building custom containers
 
-To build a custom container, begin by editing `template.singularity`. In this file, are sections which define the container to be built.   
+To build a custom container, begin by editing `template.singularity`. This file contains sections which define the container to be built:   
 
 ```
 %post
@@ -96,6 +96,12 @@ To build a custom container, begin by editing `template.singularity`. In this fi
   # Add environment variables in the %environment section. Note that these environment variables 
   # are sourced at runtime and not at build time, meaning that if the same variables are needed 
   # during build time (i.e. proxies), these should also be defined in the %post section.
+
+%runscript
+
+  # Any code here will be executed at runtime. When the %runscript is executed, all options are 
+  # passed along to the executing script at runtime
+
 ```
 
 Once template.singularity has been edited to include all the desired packages, environment settings, and runscript instructions, build a new container `custom_container.simg` with the following command:
