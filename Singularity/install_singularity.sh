@@ -8,7 +8,7 @@ sudo yum -y install squashfs-tools
 sudo yum -y install git
 
 # Download and build Singularity from the GitHub master branch
-git clone https://github.com/singularityware/singularity.git
+git clone -b release-2.6 https://github.com/singularityware/singularity.git
 cd singularity
 ./autogen.sh
 ./configure
@@ -21,4 +21,3 @@ sudo yum -y install $HOME/rpmbuild/RPMS/x86_64/singularity-*.x86_64.rpm
 # Install additional dependencies
 sudo yum -y install epel-release
 sudo yum -y install debootstrap
-
