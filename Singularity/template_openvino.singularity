@@ -1,0 +1,120 @@
+Bootstrap: docker
+From: centos:latest
+
+%post -c /bin/bash
+
+# If a proxy is required to reach internet, export those variables here in addition to the %environment section
+  
+  export http_proxy=http://proxy-chain.intel.com:911
+  export https_proxy=http://proxy-chain.intel.com:912
+  export ftp_proxy=http://proxy-chain.intel.com:911
+  export socks_proxy=http://proxy-us.intel.com:1080
+
+  yum clean all
+  rm -rf /var/cache/yum
+  yum -y install epel-release
+  yum -y groupinstall "Development Tools"
+  yum -y install wget
+  yum -y install gmp-devel mpfr-devel libmpc-devel glibc-devel.i686 libgcc.i686 gcc-c++
+  yum -y install git
+  yum -y install sudo
+  wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
+  tar -xzf gcc-6.2.0.tar.gz
+  mkdir build
+  cd build
+  ../gcc-6.2.0/configure --prefix=/opt/gcc-6.2.0
+  make -j 20
+  make install
+  export PATH=/opt/gcc-6.2.0/bin:$PATH
+  export LD_LIBRARY_PATH=/opt/gcc-6.2.0/lib64:/opt/gcc-6.2.0/lib
+ 
+  # Install Anaconda
+  wget https://repo.anaconda.com/archive/Anaconda2-5.2.0-Linux-x86_64.sh 
+  bash Anaconda2-5.2.0-Linux-x86_64.sh -b -p /opt/anaconda2
+  export PATH=/opt/anaconda2/bin:$PATH
+  rm -rf Anaconda2-5.2.0-Linux-x86_64.sh 
+
+  echo "Beginning OpenVINO install..."
+
+  INSTALL_DIR=/opt/intel/computer_vision_sdk
+  TEMP_DIR=/tmp/openvino_installer
+  cd $TEMP_DIR && pwd && ls && \
+  tar xf l_openvino_toolkit*.tgz && \
+  cd l_openvino_toolkit* && \
+  sed -i 's/decline/accept/g' silent.cfg && \
+  pwd | grep -q openvino_toolkit_p ; \
+  if [ $? = 0 ];then sed -i 's/COMPONENTS=DEFAULTS/COMPONENTS=;intel-ism__noarch;intel-cv-sdk-base-shared__noarch;intel-cv-sdk-base-l-setupvars__noarch;intel-cv-sdk-base-l-inference-engine__noarch;intel-cv-sdk-base-gfx-install__noarch;intel-cv-sdk-base-shared-pset/g' silent.cfg; fi && \
+  pwd | grep -q openvino_toolkit_fpga ; \
+  if [ $? = 0 ];then sed -i 's/COMPONENTS=DEFAULTS/COMPONENTS=;intel-ism__noarch;intel-cv-sdk-full-shared__noarch;intel-cv-sdk-full-l-setupvars__noarch;intel-cv-sdk-full-l-inference-engine__noarch;intel-cv-sdk-full-gfx-install__noarch;intel-cv-sdk-full-shared-pset/g' silent.cfg; fi && \
+  ./install.sh -s silent.cfg && \
+  rm -Rf $TEMP_DIR $INSTALL_DIR/install_dependencies $INSTALL_DIR/uninstall* /tmp/* $DL_INSTALL_DIR/documentation $DL_INSTALL_DIR/inference_engine/samples
+
+  # Install dependencies and clone necessary repos
+  yum -y install openmpi openmpi-devel
+  yum -y install environment-modules
+  source /etc/profile.d/modules.sh
+  module add mpi/openmpi-x86_64
+  yes 'y' | conda install -c anaconda tensorflow
+  pip install cython msgpack argparse psutil SimpleITK opencv-python h5py tqdm keras
+  pip install horovod
+  git clone https://github.com/NervanaSystems/topologies.git
+
+  # Install Jupyter
+  pip install jupyterlab
+  pip install numpy
+  pip install matplotlib
+  pip install ipyparallel
+
+  #In case module throws an error (eg. on TACC), use:
+  #export PATH=/usr/lib64/openmpi/bin:$PATH
+  #export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH
+  #uncomment following for running on TACC
+  #mkdir –p /home1
+  #mkdir –p /scratch
+  #mkdir –p /work
+
+%setup
+  echo "Running setup..."
+  export SINGULARITY_SHELL=/bin/bash
+  TEMP_DIR=/tmp/openvino_installer
+  INSTALL_DIR=/opt/intel/computer_vision_sdk
+  mkdir -p INSTALL_DIR
+  mkdir -p TEMP_DIR
+  echo "Completed setup."
+  
+
+%environment
+  export PATH=/opt/gcc-6.2.0/bin:$PATH
+  export LD_LIBRARY_PATH=/opt/gcc-6.2.0/lib64:/opt/gcc-6.2.0/lib
+  export PATH=/opt/anaconda2/bin:$PATH
+
+  export http_proxy=http://proxy-chain.intel.com:911
+  export https_proxy=http://proxy-chain.intel.com:912
+  export ftp_proxy=http://proxy-chain.intel.com:911
+  export socks_proxy=http://proxy-us.intel.com:1080
+
+  # Add openmpi
+  source /etc/profile.d/modules.sh
+  module add mpi/openmpi-x86_64
+
+  # KMP Settings
+  export KMP_AFFINITY=granularity=fine,compact,1,0 
+  export KMP_BLOCKTIME=0
+  export KMP_SETTINGS=0
+
+%files
+  /home/bduser/openvino/l_openvino_toolkit_p_2018.3.343_online.tgz /tmp/openvino_installer/l_openvino_toolkit_p_2018.3.343_online.tgz
+
+%runscript
+  # commands to be executed when the container runs
+  echo "Starting notebook..."
+  echo "Open browser to localhost:8888"
+  exec jupyter lab --allow-root --ip=0.0.0.0 --port=8888 --no-browser
+
+  echo "This is a Singularity image containing Intel optimized TensorFlow installation with Horovod (OpenMPI)"
+  echo "Operating System: $(cat /etc/redhat-release)"
+  echo "GCC: $(gcc --version)"
+  echo "TensorFlow: $(pip show tensorflow --disable-pip-version-check |
+  grep "^Version:" | awk '{print $NF}')"
+  echo "Horovod: $(pip show horovod --disable-pip-version-check | grep "^Version:" | awk '{print $NF}')"
+  echo "OpenMPI: $(ompi_info | grep "Open MPI:" | awk '{print $NF}')"
