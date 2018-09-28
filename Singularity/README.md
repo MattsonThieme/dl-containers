@@ -4,17 +4,17 @@ This repository contains code and instructions for running custom scripts within
 
 ## Installation/Run Instructions
 
-If running on cluster: 
+### Multi-Node Execution 
 
-1. Clone this repo on the head node by running 
+1. Clone this repo on the head node by running:
 ```
-$ git clone https://github.com/MattsonThieme/dl-containers.git
+>> $ git clone https://github.com/MattsonThieme/dl-containers.git
 ``` 
-2. Change directories into ~/dl-containers/Singularity/ and modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
+2. Change directories into ~/dl-containers/Singularity/ :
 ```
 $ cd ~/dl-containers/Singularity
 ```
-3. Modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
+3. Modify hosts.txt to include all hosts in your cluster. List each IP on its own line:
 ```
 <node1_ip>
 <node2_ip>
@@ -41,7 +41,7 @@ $ sudo singularity build tensorflow.simg template.simg
 $ pscp.pssh -h hosts.txt ~/dl-containers/Singularity/tensorflow.simg ~/dl-containers/Singularity/
 ```
 
-If running on a single node:
+### Single-Node Execution
 
 1. Clone this repo on the head node by running
 ```
