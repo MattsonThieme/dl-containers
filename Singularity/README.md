@@ -7,9 +7,13 @@ This repository contains code and instructions for running custom scripts within
 If running on cluster: 
 
 1. Clone this repo on the head node by running 
-```git clone https://github.com/MattsonThieme/dl-containers.git``` 
-2. Change directories into dl-containers/Singularity/ modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
-```cd dl-containers/Singularity```
+```
+git clone https://github.com/MattsonThieme/dl-containers.git
+``` 
+2. Change directories into dl-containers/Singularity/ and modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
+```
+cd dl-containers/Singularity
+```
 3. Modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
 ```
 <node1_ip>
@@ -20,15 +24,27 @@ If running on cluster:
 ...
 ```
 4. Ensure that passwordless ssh is enabled between all nodes.
-5. Configure all the servers identically with `setup_envs.sh`. This will install all necessary packages and configure each node identically.:
+5. Configure all the servers with `setup_envs.sh`. This will install all necessary packages and configure each node identically.
 ```
 bash setup_envs.sh
 ```
 6. Run use `mpitest.sh` to verify connectivity:
-
 ```
 bash mpitest.sh
 ```
+
+If running on a single node:
+
+1. Clone this repo on the head node by running
+```
+git clone https://github.com/MattsonThieme/dl-containers.git
+```
+2. Configure local environment and install Singularity with `setup_envs.sh`.
+```
+bash setup_envs.sh
+```
+
+--- IN PROGRESS ---
 
 ## Run TF CNN Benchmarks with Intel Optimized Containers
 
