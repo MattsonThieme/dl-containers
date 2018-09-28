@@ -8,11 +8,11 @@ If running on cluster:
 
 1. Clone this repo on the head node by running 
 ```
-git clone https://github.com/MattsonThieme/dl-containers.git
+$ git clone https://github.com/MattsonThieme/dl-containers.git
 ``` 
 2. Change directories into ~/dl-containers/Singularity/ and modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
 ```
-cd ~/dl-containers/Singularity
+$ cd ~/dl-containers/Singularity
 ```
 3. Modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
 ```
@@ -26,30 +26,30 @@ cd ~/dl-containers/Singularity
 4. Ensure that passwordless ssh is enabled between all nodes.
 5. Configure all the servers with `setup_envs.sh`. This will install all necessary packages and configure each node identically.
 ```
-bash setup_envs.sh
+$ bash setup_envs.sh
 ```
 6. Run use `mpitest.sh` to verify connectivity:
 ```
-bash mpitest.sh
+$ bash mpitest.sh
 ```
 7. Build the Singularity container with the following command (this will take a few minutes).
 ```
-sudo singularity build tensorflow.simg template.simg
+$ sudo singularity build tensorflow.simg template.simg
 ```
 8. Copy the Singularity image to the same location on all nodes with pssh.
 ```
-pscp.pssh -h hosts.txt ~/dl-containers/Singularity/tensorflow.simg ~/dl-containers/Singularity/
+$ pscp.pssh -h hosts.txt ~/dl-containers/Singularity/tensorflow.simg ~/dl-containers/Singularity/
 ```
 
 If running on a single node:
 
 1. Clone this repo on the head node by running
 ```
-git clone https://github.com/MattsonThieme/dl-containers.git
+$ git clone https://github.com/MattsonThieme/dl-containers.git
 ```
 2. Configure local environment and install Singularity with `setup_envs.sh`.
 ```
-bash setup_envs.sh
+$ bash setup_envs.sh
 ```
 
 --- IN PROGRESS ---
