@@ -6,6 +6,7 @@ sudo yum -y groupinstall "Development Tools"
 sudo yum -y install libarchive-devel
 sudo yum -y install squashfs-tools
 sudo yum -y install git
+sudo yum -y install pssh
 
 # Download and build Singularity from the GitHub master branch
 git clone -b release-2.6 https://github.com/singularityware/singularity.git
