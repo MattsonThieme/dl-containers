@@ -7,9 +7,9 @@ This repository contains code and instructions for running custom scripts within
 ### Multi-Node Execution 
 
 1. Clone this repo on the head node by running:
-```
->> $ git clone https://github.com/MattsonThieme/dl-containers.git
-``` 
+   ```
+   $ git clone https://github.com/MattsonThieme/dl-containers.git
+   ``` 
 2. Change directories into ~/dl-containers/Singularity/ :
 ```
 $ cd ~/dl-containers/Singularity
