@@ -2,21 +2,33 @@
 
 This repository contains code and instructions for running custom scripts within Singularity containers optimized for execution on Intel Architecture. OpenMPI and Horovod libraries facilitate multi-node and multi-worker training. All scripts are built for CentOS 7 and may require modifications for other operating systems. 
 
-## Cluster Requirements
+## Installation/Run Instructions
 
-Before use, Singularity must be installed on all nodes and its path added to the PATH variable in .bashrc. To install Singularity, run:
+If running on cluster: 
+
+1. Clone this repo on the head node by running 
+```git clone https://github.com/MattsonThieme/dl-containers.git``` 
+2. Change directories into dl-containers/Singularity/ modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
+```cd dl-containers/Singularity```
+3. Modify hosts.txt to include all hosts in your cluster. List each IP on its own line.
+```
+<node1_ip>
+<node2_ip>
+<node3_ip>
+<node4_ip>
+...
+...
+```
+4. Ensure that passwordless ssh is enabled between all nodes.
+5. Configure all the servers identically with `setup_envs.sh`. This will install all necessary packages and configure each node identically.:
+```
+bash setup_envs.sh
+```
+6. Run use `mpitest.sh` to verify connectivity:
 
 ```
-bash install_singularity.sh
+bash mpitest.sh
 ```
-
-OpenMPI must also be installed:
-
-```
-sudo yum install openmpi openmpi-devel
-```
-
-Once OpenMPI is installed and hosts.txt is updated, run `bash mpitest.sh` to verify connectivity.
 
 ## Run TF CNN Benchmarks with Intel Optimized Containers
 
