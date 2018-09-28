@@ -21,3 +21,6 @@ sudo yum -y install $HOME/rpmbuild/RPMS/x86_64/singularity-*.x86_64.rpm
 # Install additional dependencies
 sudo yum -y install epel-release
 sudo yum -y install debootstrap
+
+# Install openmpi
+sudo yum install openmpi openmpi-devel
