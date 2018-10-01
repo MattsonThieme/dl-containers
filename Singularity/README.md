@@ -23,19 +23,21 @@ This repository contains code and instructions for running custom scripts within
    ...
    ...
    ```
-4. Ensure that passwordless ssh is enabled between all nodes.
+4. Ensure that [passwordless ssh](https://www.tecmint.com/ssh-passwordless-login-using-ssh-keygen-in-5-easy-steps/) is enabled between all nodes. This will need to be configured between all the nodes and in all directions (i.e. node1 -> node2 _and_ node2 -> node1).
 5. Configure all the servers with `setup_envs.sh`. This will install all necessary packages and configure each node identically.
    ```
    $ bash setup_envs.sh
    ```
-6. Run use `mpitest.sh` to verify connectivity:
+6. Run `mpitest.sh` to verify connectivity between all the nodes::
    ```
    $ bash mpitest.sh
    ```
-7. Build the Singularity container with the following command (this will take a few minutes).
+7. Build the default Singularity container with the following command (this will take a few minutes):
    ```
    $ sudo singularity build tensorflow.simg template.simg
    ```
+   If you would like to build custom containers, please refer to the [Building custom containers](https://github.com/MattsonThieme/dl-containers/tree/master/Singularity#building-custom-containers) section below.
+
 8. Copy the Singularity image to the same location on all nodes with pssh.
    ```
    $ pscp.pssh -h hosts.txt ~/dl-containers/Singularity/tensorflow.simg ~/dl-containers/Singularity/
