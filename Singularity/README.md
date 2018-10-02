@@ -4,7 +4,7 @@ This repository contains code and instructions for running custom scripts within
 
 ## Setup
 
-### Multi-Node Execution 
+### Multi-Node Setup/Execution
 
 1. Clone this repo on the head node by running:
    ```
@@ -28,6 +28,7 @@ This repository contains code and instructions for running custom scripts within
    ```
    $ bash setup_envs.sh
    ```
+   The `setup_envs.sh` script runs `config_env.sh` on each node. If your configuration requires additional packages to those described in `config_env.sh`, simply add them there and rerun `setup_envs.sh`.
 6. Run `mpitest.sh` to verify connectivity between all the nodes::
    ```
    $ bash mpitest.sh
@@ -41,6 +42,33 @@ This repository contains code and instructions for running custom scripts within
 8. Copy the Singularity image to the same location on all nodes with pssh.
    ```
    $ pscp.pssh -h hosts.txt ~/dl-containers/Singularity/tensorflow.simg ~/dl-containers/Singularity/
+   ```
+   This will need to be performed each time a new container is built.
+
+9. Run TensorFlow CNN Benchmarks within the script using:
+   ```
+   $ sudo singularity exec -B /home/,/usr/ tensorflow.simg bash run_tf_cnn_benchmarks.sh
+   ```
+   The `-B` flag specifies which directories to bind to the container during execution. If your script or data are located external to the container, you will need to bind their directories.
+
+   This will run the tf_cnn_benchmarks.py script on all nodes listed in hosts.txt.
+
+10. To run custom scripts, edit the following variables in `run_user_script.sh` to reflect the locations of your script/data:
+   ```
+   ...
+   # Update the following variables to reflect your configuration
+   # The workspace directory should contain both data and code
+
+   PATH_TO_WORKSPACE="/full/path/to/workspace/dir/"
+   PATH_TO_SCRIPT="/full/path/to/script.py"
+   PATH_TO_DATA="/full/path/to/data"
+   PATH_TO_SINGULARITY="/full/path/to/singularity/executable"  # Singularity executable will usually be in ~/singularity/bin/singularity
+   PATH_TO_SIMG="/full/path/to/<your_singularity_image>.simg"
+   ...
+   ```
+   Then run:
+   ```
+   $ sudo singularity exec -B /home/,/usr/ <your_singularity_image>.simg bash run_user_script.sh
    ```
 
 ### Single-Node Execution
