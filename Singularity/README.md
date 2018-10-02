@@ -58,7 +58,7 @@ This repository contains code and instructions for running custom scripts within
    ...
    # Update the following variables to reflect your configuration
    # The workspace directory should contain both data and code
-
+   
    PATH_TO_WORKSPACE="/full/path/to/workspace/dir/"
    PATH_TO_SCRIPT="/full/path/to/script.py"
    PATH_TO_DATA="/full/path/to/data"
@@ -68,9 +68,9 @@ This repository contains code and instructions for running custom scripts within
    ```
    Then run:
    ```
-   $ sudo singularity exec -B /home/,/usr/ <your_singularity_image>.simg bash run_user_script.sh
+   $ sudo singularity exec -B /required/directories/ <your_singularity_image>.simg bash run_user_script.sh
    ```
-
+   
 ### Single-Node Execution
 
 1. Clone this repo on the head node by running
