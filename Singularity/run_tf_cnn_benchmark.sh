@@ -13,6 +13,10 @@ HOSTFILE=hosts.txt
 NUM_WORKERS_PER_NODE=2
 NUM_INTER_THREADS=2
 
+# Copy tf_cnn_benchmarks.py script to all nodes listed in hosts.txt
+pssh -h hosts.txt  mkdir -p `pwd`
+prsync -h hosts.txt ${PATH_TO_SCRIPT} `pwd`
+
 # Calculate MPI execution parameters given workers/node, number of nodes, and core counts on each node
 
 export physical_cores=`lscpu | grep "Core(s) per socket" | cut -d':' -f2 | xargs` # Total number of physical cores per socket
