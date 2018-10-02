@@ -11,6 +11,10 @@ PATH_TO_DATA="/root/data"
 PATH_TO_SINGULARITY="/root/singularity/bin/singularity"
 PATH_TO_SIMG="/root/tf-hvd.simg"
 
+# Copy updated script to all nodes listed in hosts.txt
+pssh -h hosts.txt  mkdir -p `pwd`
+prsync -h hosts.txt ${PATH_TO_SCRIPT} `pwd`
+
 TF_LOGDIR=_multiworker
 HOSTFILE=hosts.txt
 NUM_WORKERS_PER_NODE=2
