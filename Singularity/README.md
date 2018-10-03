@@ -2,9 +2,13 @@
 
 This repository contains code and instructions for running custom scripts within Singularity containers optimized for execution on Intel Architecture. OpenMPI and Horovod libraries facilitate multi-node and multi-worker training. All scripts are built for CentOS 7 and may require modifications for other operating systems. 
 
-## Setup
+## Configuring the environment
 
-### Multi-Node Setup/Execution
+Single and multi-node environments must be configured slightly differently. Here, we describe the steps to setup such environments. If your environment is already configured, please see the [Execution](https://github.com/MattsonThieme/dl-containers/tree/master/Singularity#execution) section.
+
+### Multi-Node
+
+In addition to the libraries inside the Singularity container, multi-node execution requires communication libraries to be installed globally on each node. This section details the install such dependencies across the entire cluster.
 
 1. Clone this repo on the head node by running:
    ```
@@ -23,16 +27,18 @@ This repository contains code and instructions for running custom scripts within
    ...
    ...
    ```
-4. Ensure that [passwordless ssh](https://www.tecmint.com/ssh-passwordless-login-using-ssh-keygen-in-5-easy-steps/) is enabled between all nodes. This will need to be configured between all the nodes and in all directions (i.e. node1 -> node2 _and_ node2 -> node1).
+4. Ensure that [passwordless ssh](https://www.tecmint.com/ssh-passwordless-login-using-ssh-keygen-in-5-easy-steps/) is enabled between all nodes and in all directions (i.e. node1 -> node2 _and_ node2 -> node1).
 5. Configure all the servers with `setup_envs.sh`. This will install all necessary packages and configure each node identically.
    ```
    $ bash setup_envs.sh
    ```
    The `setup_envs.sh` script runs `config_env.sh` on each node. If your configuration requires additional packages to those described in `config_env.sh`, simply add them there and rerun `setup_envs.sh`.
-6. Run `mpitest.sh` to verify connectivity between all the nodes::
+6. **One time only, to verify connectivity between the nodes**, run `mpitest.sh`::
    ```
    $ bash mpitest.sh
    ```
+   If MPI can communicate between all the nodes, the test will succeed and the script will print the hostnames of all the nodes in the network to stdout.
+
 7. Build the default Singularity container with the following command (this will take a few minutes):
    ```
    $ sudo singularity build tensorflow.simg template.simg
@@ -45,32 +51,7 @@ This repository contains code and instructions for running custom scripts within
    ```
    This will need to be performed each time a new container is built.
 
-9. Run TensorFlow CNN Benchmarks within the script using:
-   ```
-   $ sudo singularity exec -B /home/,/usr/ tensorflow.simg bash run_tf_cnn_benchmarks.sh
-   ```
-   The `-B` flag specifies which directories to bind to the container during execution. If your script or data are located external to the container, you will need to bind their directories.
-
-   This will run the tf_cnn_benchmarks.py script on all nodes listed in hosts.txt.
-
-10. To run custom scripts, edit the following variables in `run_user_script.sh` to reflect the locations of your script/data:
-   ```
-   ...
-   # Update the following variables to reflect your configuration
-   # The workspace directory should contain both data and code
-   PATH_TO_WORKSPACE="/full/path/to/workspace/dir/"
-   PATH_TO_SCRIPT="/full/path/to/script.py"
-   PATH_TO_DATA="/full/path/to/data"
-   PATH_TO_SINGULARITY="/full/path/to/singularity/executable"  # Singularity executable will usually be in ~/singularity/bin/singularity
-   PATH_TO_SIMG="/full/path/to/<your_singularity_image>.simg"
-   ...
-   ```
-   Then run:
-   ```
-   $ sudo singularity exec -B /required/directories/ <your_singularity_image>.simg bash run_user_script.sh
-   ```
-   
-### Single-Node Execution
+### Single-Node
 
 1. Clone this repo on the head node by running
    ```
@@ -80,6 +61,40 @@ This repository contains code and instructions for running custom scripts within
    ```
    $ bash setup_envs.sh
    ```
+
+## Execution
+
+Execution in single and multi-node environments also requires slightly different run commands. Namely, we initiate training in a multi-node setting with an `mpirun` call, whereas single node runs may be initiated by calling `sudo singularity exec ...` directly. This section details execution instructions for each case.
+
+### Multi-Node
+
+1. Run TensorFlow CNN Benchmarks within the script using:
+   ```
+   $ sudo singularity exec -B /home/,/usr/ tensorflow.simg bash run_tf_cnn_benchmarks.sh
+   ```
+   The `-B` flag specifies which directories to bind to the container during execution. If your script or data are located external to the container, you will need to bind their directories.
+
+   This will run the tf_cnn_benchmarks.py script on all nodes listed in hosts.txt.
+
+2. To run custom scripts, edit the following variables in `run_user_script.sh` to reflect the locations of your script/data:
+   ```
+   ...
+   # Update the following variables to reflect your configuration
+   # The workspace directory should contain both data and code
+   PATH_TO_WORKSPACE="/full/path/to/workspace/dir/"
+   PATH_TO_SCRIPT="/full/path/to/script.py"
+   PATH_TO_DATA="/full/path/to/data"
+   PATH_TO_SINGULARITY="/full/path/to/singularity/executable"  # Usually ~/singularity/bin/singularity
+   PATH_TO_SIMG="/full/path/to/<your_image>.simg"
+   ...
+   ```
+   Then run:
+   ```
+   $ sudo singularity exec -B /req/directories/ <your_image>.simg bash run_user_script.sh
+   ```
+
+### Single-Node
+
 
 --- IN PROGRESS ---
 
