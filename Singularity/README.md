@@ -1,6 +1,8 @@
 # Intel Optimized Singularity Containers
 
-This repository contains code and instructions for running custom scripts within Singularity containers optimized for execution on Intel Architecture. OpenMPI and Horovod libraries facilitate multi-node and multi-worker training. All scripts are built for CentOS 7 and may require modifications for other operating systems. 
+This repository contains code and instructions for running custom scripts within Singularity containers optimized for execution on Intel Architecture. OpenMPI and Horovod libraries facilitate multi-node and multi-worker training. 
+
+Note: __All scripts are built for CentOS 7 and may require modifications (i.e. using apt in place of yum on Ubuntu) for other operating systems.__ 
 
 ## Configuring the environment
 
@@ -62,17 +64,87 @@ In addition to the libraries inside the Singularity container, multi-node execut
    $ bash setup_envs.sh
    ```
 
+--- IN PROGRESS ---
+
 ## Execution
 
 Execution in single and multi-node environments also requires slightly different run commands. Namely, we initiate training in a multi-node setting with an `mpirun` call, whereas single node runs may be initiated by calling `sudo singularity exec ...` directly. This section details execution instructions for each case.
 
 ### Multi-Node
 
-1. Run TensorFlow CNN Benchmarks within the script using:
+To run TensorFlow benchmarks:
+
+1. Clone the [benchmarks repo](https://github.com/tensorflow/benchmarks.git) into the root directory, then update the following variables in `run_tf_cnn_benchmarks.sh`:
+
    ```
-   $ sudo singularity exec -B /home/,/usr/ tensorflow.simg bash run_tf_cnn_benchmarks.sh
+   ...
+   # Update the following variables to reflect your configuration
+   # The workspace directory should contain both data and code
+   PATH_TO_WORKSPACE="/full/path/to/workspace/dir/"            # Usually set to /root/
+   PATH_TO_SCRIPT="/full/path/to/tf_cnn_benchmarks.py"
+   PATH_TO_SINGULARITY="/full/path/to/singularity/executable"  # Usually ~/singularity/bin/singularity
+   PATH_TO_SIMG="/full/path/to/<your_image>.simg"
+   HOSTFILE=hosts.txt
+   NUM_WORKERS_PER_NODE=2                                      # Edit to increase or decrease # workers/node
+   ...
    ```
-   The `-B` flag specifies which directories to bind to the container during execution. If your script or data are located external to the container, you will need to bind their directories.
+
+   Optionally, the arguments passed to `tf_cnn_benchmarks.py` may be also be edited:
+
+   ```
+   # TF CNN Benchmark arguments
+   args=" \
+   --batch_size=64 \
+   --model=resnet50 \
+   --num_intra_threads $num_threads \
+   --num_inter_threads $NUM_INTER_THREADS \
+   --display_every 5 \
+   --data_format NHWC \
+   --optimizer momentum \
+   --forward_only False \  # Switch to True for inference
+   --device cpu"
+   ```
+
+2. Execute the script with:
+
+   ```
+   $ bash run_tf_cnn_benchmark.sh
+   ```
+
+To run a custom script:
+
+1. Edit `run_user_script.sh` to reflect the location of your script and data:
+
+   ```
+   ...
+   # Update the following variables to reflect your configuration
+   # The workspace directory should contain both data and code
+   PATH_TO_WORKSPACE="/full/path/to/workspace/dir/"            # Contains any required data/code
+   PATH_TO_SCRIPT="/full/path/to/script.py"
+   PATH_TO_DATA="/full/path/to/data"
+   PATH_TO_SINGULARITY="/full/path/to/singularity/executable"  # Usually ~/singularity/bin/singularity
+   PATH_TO_SIMG="/full/path/to/<your_image>.simg"
+   
+   
+   TF_LOGDIR=_multiworker
+   HOSTFILE=hosts.txt
+   NUM_WORKERS_PER_NODE=2
+   ...
+   ```
+
+   Note: __Both data and the custom script must be in identical locations on each node__
+
+2. Execute the script with:
+
+   ```
+   $ bash run_user_script.sh
+   ```
+
+### Single node
+
+1. FIRST STEPS
+
+   The `-B` flag specifies which directories to bind to the container during execution. Bind the workspace directory having all necessary data and code. 
 
    This will run the tf_cnn_benchmarks.py script on all nodes listed in hosts.txt.
 
@@ -93,67 +165,7 @@ Execution in single and multi-node environments also requires slightly different
    $ sudo singularity exec -B /req/directories/ <your_image>.simg bash run_user_script.sh
    ```
 
-### Single-Node
-
-
 --- IN PROGRESS ---
-
-## Run TF CNN Benchmarks with Intel Optimized Containers
-
-With MPI configured, clone https://github.com/tensorflow/benchmarks.git into the root directory, then update the following variables in `run_tf_cnn_benchmark.sh`:
-
-```
-# Update the following variables to reflect your configuration
-# By default, we run tf_cnn_benchmarks.py using synthetic data
-
-PATH_TO_WORKSPACE="/root/"
-PATH_TO_SCRIPT="/root/benchmarks/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py"
-PATH_TO_SINGULARITY="/root/singularity/bin/singularity"
-PATH_TO_SIMG="/root/tf-hvd.simg"
-HOSTFILE=hosts.txt
-NUM_WORKERS_PER_NODE=2
-NUM_INTER_THREADS=2
-```
-Additionally, the arguments passed to `tf_cnn_benchmarks.py` can be edited in `run_tf_cnn_benchmark.sh` via:
-
-```
-# TF CNN Benchmark arguments
-args=" \
---batch_size=64 \
---model=resnet50 \
---num_intra_threads $num_threads \
---num_inter_threads $NUM_INTER_THREADS \
---display_every 5 \
---data_format NHWC \
---optimizer momentum \
---forward_only False \  # Switch to True for inference
---device cpu"
-```
-
-Once these are updated, run `bash run_tf_cnn_benchmark.sh` to initiate training.
-
-## Run custom scripts with Intel Optimized Containers
-
-As with `tf_cnn_benchmark.sh`, to run a custom script within the container, edit the run script `run_user_script.sh`:
-
-```
-# Update the following variables to reflect your configuration
-# The workspace directory should contain both data and code
-
-PATH_TO_WORKSPACE="/root/"
-PATH_TO_SCRIPT="/root/topologies/distributed_unet/Horovod/hvd_train.py"
-PATH_TO_DATA="/root/data"
-PATH_TO_SINGULARITY="/root/singularity/bin/singularity"
-PATH_TO_SIMG="/root/tf-hvd.simg"
-
-TF_LOGDIR=_multiworker
-HOSTFILE=hosts.txt
-NUM_WORKERS_PER_NODE=2
-NUM_INTER_THREADS=2
-```
-Data and the run script must be kept in identical locations on each node. 
-
-Once `run_user_script.sh` has been updated and all the data and scripts are in identical locations on each node, execute with `bash run_user_script.sh`. 
 
 ## Building custom containers
 
