@@ -1,0 +1,95 @@
+Bootstrap: docker
+From: centos:latest
+
+%post -c /bin/bash
+
+# If a proxy is required to reach internet, export those variables here in addition to the %environment section
+  
+  export http_proxy=http://proxy-chain.intel.com:911
+  export https_proxy=http://proxy-chain.intel.com:912
+  export ftp_proxy=http://proxy-chain.intel.com:911
+  export socks_proxy=http://proxy-us.intel.com:1080
+
+  yum clean all
+  rm -rf /var/cache/yum
+  yum -y install epel-release
+  yum -y groupinstall "Development Tools"
+  yum -y install wget
+  yum -y install gmp-devel mpfr-devel libmpc-devel glibc-devel.i686 libgcc.i686 gcc-c++
+  yum -y install git
+  wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
+  tar -xzf gcc-6.2.0.tar.gz
+  mkdir build
+  cd build
+  ../gcc-6.2.0/configure --prefix=/opt/gcc-6.2.0
+  make -j 20
+  make install
+  export PATH=/opt/gcc-6.2.0/bin:$PATH
+  export LD_LIBRARY_PATH=/opt/gcc-6.2.0/lib64:/opt/gcc-6.2.0/lib
+  
+  # Install Anaconda
+  wget https://repo.anaconda.com/archive/Anaconda2-5.2.0-Linux-x86_64.sh 
+  bash Anaconda2-5.2.0-Linux-x86_64.sh -b -p /opt/anaconda2
+  export PATH=/opt/anaconda2/bin:$PATH
+  rm -rf Anaconda2-5.2.0-Linux-x86_64.sh 
+  
+  # Install dependencies and clone necessary repos
+  yum -y install openmpi openmpi-devel
+  yum -y install environment-modules
+  source /etc/profile.d/modules.sh
+  module add mpi/openmpi-x86_64
+
+  pip install mxnet
+
+  pip install cython msgpack argparse psutil SimpleITK opencv-python h5py tqdm keras
+  pip install horovod
+
+  # Install Jupyter
+  pip install jupyterlab
+  pip install numpy
+  pip install matplotlib
+  pip install ipyparallel
+
+  #In case module throws an error (eg. on TACC), use:
+  #export PATH=/usr/lib64/openmpi/bin:$PATH
+  #export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH
+  #uncomment following for running on TACC
+  #mkdir –p /home1
+  #mkdir –p /scratch
+  #mkdir –p /work
+
+%setup
+  export SINGULARITY_SHELL=/bin/bash
+
+%environment
+  export PATH=/opt/gcc-6.2.0/bin:$PATH
+  export LD_LIBRARY_PATH=/opt/gcc-6.2.0/lib64:/opt/gcc-6.2.0/lib
+  export PATH=/opt/anaconda2/bin:$PATH
+
+  export http_proxy=http://proxy-chain.intel.com:911
+  export https_proxy=http://proxy-chain.intel.com:912
+  export ftp_proxy=http://proxy-chain.intel.com:911
+  export socks_proxy=http://proxy-us.intel.com:1080
+
+  # Add openmpi
+  source /etc/profile.d/modules.sh
+  module add mpi/openmpi-x86_64
+
+  # KMP Settings
+  export KMP_AFFINITY=granularity=fine,compact,1,0 
+  export KMP_BLOCKTIME=0
+  export KMP_SETTINGS=0
+
+%runscript
+  # commands to be executed when the container runs
+  echo "Starting notebook..."
+  echo "Open browser to localhost:8888"
+  exec jupyter lab --allow-root --ip=0.0.0.0 --port=8888 --no-browser
+
+  echo "This is a Singularity image containing Intel optimized MXNet installation with Horovod (OpenMPI)"
+  echo "Operating System: $(cat /etc/redhat-release)"
+  echo "GCC: $(gcc --version)"
+  echo "MXNet: $(pip show mxnet)"
+  grep "^Version:" | awk '{print $NF}')"
+  echo "Horovod: $(pip show horovod --disable-pip-version-check | grep "^Version:" | awk '{print $NF}')"
+  echo "OpenMPI: $(ompi_info | grep "Open MPI:" | awk '{print $NF}')"
