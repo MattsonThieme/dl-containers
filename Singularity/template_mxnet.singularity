@@ -39,7 +39,7 @@ From: centos:latest
   source /etc/profile.d/modules.sh
   module add mpi/openmpi-x86_64
 
-  pip install mxnet
+  pip install mxnet-mkl
 
   pip install cython msgpack argparse psutil SimpleITK opencv-python h5py tqdm keras
   pip install horovod
@@ -79,6 +79,7 @@ From: centos:latest
   export KMP_AFFINITY=granularity=fine,compact,1,0 
   export KMP_BLOCKTIME=0
   export KMP_SETTINGS=0
+  # export OMP_NUM_THREADS=32
 
 %runscript
   # commands to be executed when the container runs
