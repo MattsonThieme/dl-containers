@@ -8,7 +8,7 @@
 PATH_TO_WORKSPACE="/root/"
 PATH_TO_SCRIPT="/root/topologies/distributed_unet/Horovod/main.py"
 PATH_TO_DATA="synthetic"  # To train on real data, change to absolute data path
-PATH_TO_SINGULARITY="/root/singularity/bin/singularity"
+PATH_TO_SINGULARITY=`which singularity`
 PATH_TO_SIMG="/root/tf-hvd.simg"
 
 # Copy updated script to all nodes listed in hosts.txt
