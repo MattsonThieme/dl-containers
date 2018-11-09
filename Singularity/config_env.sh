@@ -9,6 +9,7 @@ sudo yum -y install git
 sudo yum -y install pssh
 
 # Download and build Singularity from the GitHub master branch
+cd /tmp/
 git clone -b vault/release-2.6 https://github.com/singularityware/singularity.git
 cd singularity
 ./autogen.sh
