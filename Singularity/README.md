@@ -63,8 +63,7 @@ In addition to the libraries inside the Singularity container, multi-node execut
    ```
    $ bash setup_envs.sh
    ```
-
---- IN PROGRESS ---
+   If you would like to build custom containers, please refer to the [Building custom containers](https://github.com/MattsonThieme/dl-containers/tree/master/Singularity#building-custom-containers) section below.
 
 ## Execution
 
@@ -165,7 +164,7 @@ To run a custom script:
    $ sudo singularity exec -B /req/directories/ <your_image>.simg bash run_user_script.sh
    ```
 
---- IN PROGRESS ---
+3. 
 
 ## Building custom containers
 
